@@ -245,8 +245,8 @@ class DqnAgent(tf_agent.TFAgent):
     self._check_network_output(self._target_q_network, 'target_q_network')
 
     self._epsilon_greedy = epsilon_greedy
-    self._epsilon_decay_end_count: epsilon_decay_end_count
-    self._epsilon_decay_end_value: epsilon_decay_end_value
+    self._epsilon_decay_end_count = epsilon_decay_end_count
+    self._epsilon_decay_end_value = epsilon_decay_end_value
     self._n_step_update = n_step_update
     self._boltzmann_temperature = boltzmann_temperature
     self._optimizer = optimizer
