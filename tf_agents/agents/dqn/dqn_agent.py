@@ -38,7 +38,7 @@ from tf_agents.agents import tf_agent
 from tf_agents.networks import network
 from tf_agents.networks import utils as network_utils
 from tf_agents.policies import boltzmann_policy
-from tf_agents.policies import epsilon_greedy_policy
+from tf_agents.policies import epsilon_greedy_decay_policy as epsilon_greedy_policy
 from tf_agents.policies import greedy_policy
 from tf_agents.policies import q_policy
 from tf_agents.specs import tensor_spec
@@ -102,6 +102,8 @@ class DqnAgent(tf_agent.TFAgent):
       observation_and_action_constraint_splitter: Optional[
           types.Splitter] = None,
       epsilon_greedy: Optional[types.FloatOrReturningFloat] = 0.1,
+      epsilon_decay_end_count: Optional[types.Float] = None,
+      epsilon_decay_end_value: Optional[types.Float] = None,
       n_step_update: int = 1,
       boltzmann_temperature: Optional[types.FloatOrReturningFloat] = None,
       emit_log_probability: bool = False,
@@ -243,6 +245,8 @@ class DqnAgent(tf_agent.TFAgent):
     self._check_network_output(self._target_q_network, 'target_q_network')
 
     self._epsilon_greedy = epsilon_greedy
+    self._epsilon_decay_end_count: epsilon_decay_end_count
+    self._epsilon_decay_end_value: epsilon_decay_end_value
     self._n_step_update = n_step_update
     self._boltzmann_temperature = boltzmann_temperature
     self._optimizer = optimizer
@@ -339,7 +343,8 @@ class DqnAgent(tf_agent.TFAgent):
           policy, temperature=self._boltzmann_temperature)
     else:
       collect_policy = epsilon_greedy_policy.EpsilonGreedyPolicy(
-          policy, epsilon=self._epsilon_greedy)
+          policy, epsilon=self._epsilon_greedy, 
+          epsilon_decay_end_count=self._epsilon_decay_end_count, epsilon_decay_end_value=self._epsilon_decay_end_value)
     policy = greedy_policy.GreedyPolicy(policy)
 
     # Create self._target_greedy_policy in order to compute target Q-values.
